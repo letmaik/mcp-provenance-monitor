@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - MCP Provenance Monitor</title>
+    <link rel="icon" type="image/png" href="favicon-32x32.png">
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --accent-primary: #4e54c8;
+            --accent-secondary: #8f94fb;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8d4;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --status-red: #ff4d6d;
+            --status-yellow: #ffbe0b;
+            --status-green: #06d6a0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(78, 84, 200, 0.3);
+        }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        .back-link-wrapper {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+        .back-link-text {
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .back-link:hover .back-link-text, .back-link:focus .back-link-text {
+            text-decoration: underline;
+        }
+        main {
+            max-width: 700px;
+            margin: 2rem auto 0 auto;
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 0rem 2.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        h2 {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            color: var(--accent-secondary);
+        }
+        p, li {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+        ul {
+            margin: 1rem 0 1rem 1.5rem;
+        }
+        .faq {
+            margin-top: 2.5rem;
+        }
+        .faq-item {
+            margin-bottom: 1.5rem;
+        }
+        .faq-q {
+            font-weight: bold;
+            color: var(--accent-primary);
+            margin-bottom: 0.2em;
+        }
+        .faq-a {
+            margin-left: 1em;
+        }
+        a {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            transition: text-decoration 0.2s;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MCP Provenance Monitor</h1>
+        <div class="back-link-wrapper">
+            <a href="index.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Overview
+            </a>
+        </div>
+    </header>
+    <main>
+        <h2>About</h2>
+        <p>
+            The MCP Provenance Monitor is a web dashboard for monitoring the software supply chain provenance of local MCP (Model Context Protocol) server packages.
+        </p>
+        <div class="faq">
+            <h2>FAQ</h2>
+            <div class="faq-item">
+                <div class="faq-q">Why is MCP server xyz missing?</div>
+                <div class="faq-a">
+                    <ul>
+                        <li>Currently, only servers published on <b>npm</b> or <b>PyPI</b> are supported.</li>
+                        <li>Server data is sourced from the MCP registry at <a href="https://github.com/modelcontextprotocol/registry" target="_blank">https://github.com/modelcontextprotocol/registry</a>, which is still under development and not updated regularly. Manual additions are not supported yet.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">How can I add provenance to my MCP server?</div>
+                <div class="faq-a">
+                    <ul>
+                        <li>For NPM packages, see <a href="https://docs.npmjs.com/generating-provenance-statements" target="_blank">Generating provenance statements</a>.</li>
+                        <li>For PyPI packages, see <a href="https://docs.pypi.org/attestations/producing-attestations/" target="_blank">Producing attestations</a>.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">How can I add provenance to dependencies?</div>
+                <div class="faq-a">
+                    <p>Help improve the ecosystem by contributing to dependency packages: ensure they are built in CI and publish provenance. You can also consider submitting a pull request to those projects.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">I just released a new version with provenance, but it still says provenance is missing. Why?</div>
+                <div class="faq-a">
+                    <p>Data is refreshed daily. If you just published a new version, please allow up to one day for the update to appear.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">Do MCP clients check provenance?</div>
+                <div class="faq-a">
+                    <p>Not yet. For updates, see <a href="https://github.com/modelcontextprotocol/modelcontextprotocol/issues/526" target="_blank">this issue</a>.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

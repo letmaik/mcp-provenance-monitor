@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Provenance Monitor</title>
+    <link rel="icon" type="image/png" href="favicon-32x32.png">
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --accent-primary: #4e54c8;
+            --accent-secondary: #8f94fb;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8d4;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --status-red: #ff4d6d;
+            --status-yellow: #ffbe0b;
+            --status-green: #06d6a0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(78, 84, 200, 0.3);
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .server-card {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .server-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+        
+        .server-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+        
+        .server-name-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .server-name {
+            font-size: 1.4rem;
+            margin-right: 10px;
+            flex-grow: 1;
+        }
+
+        .server-version {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+        
+        .status-light {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .status-red {
+            background-color: var(--status-red);
+            box-shadow: 0 0 15px var(--status-red);
+        }
+        
+        .status-yellow {
+            background-color: var(--status-yellow);
+            box-shadow: 0 0 15px var(--status-yellow);
+        }
+        
+        .status-green {
+            background-color: var(--status-green);
+            box-shadow: 0 0 15px var(--status-green);
+        }
+        
+        .server-stats {
+            margin-top: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .provenance-header {
+            font-size: 1rem;
+            padding: 4px 0;
+        }
+        
+        .attestation-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 4px 0;
+        }
+        
+        .card-divider {
+            border: none;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+        }
+        
+        .view-details {
+            color: var(--accent-secondary);
+            padding: 4px 0;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .stat-box {
+            background: rgba(14, 14, 22, 0.4);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stat-badge {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 6px;
+        }
+        
+        .stat-badge-error {
+            background-color: rgba(255, 77, 109, 0.2);
+            border: 1px solid rgba(255, 77, 109, 0.4);
+            color: var(--status-red);
+        }
+        
+        .stat-badge-warning {
+            background-color: rgba(255, 190, 11, 0.2);
+            border: 1px solid rgba(255, 190, 11, 0.4);
+            color: var(--status-yellow);
+        }
+        
+        .stat-badge-success {
+            background-color: rgba(6, 214, 160, 0.2);
+            border: 1px solid rgba(6, 214, 160, 0.4);
+            color: var(--status-green);
+        }
+
+        .stat-badge-neutral {
+            background-color: rgba(120, 120, 140, 0.18);
+            border: 1px solid rgba(120, 120, 140, 0.35);
+            color: #b8b8d4;
+        }
+        
+        .attestation-badge {
+            font-size: 0.8rem;
+            padding: 0 8px;
+            border-radius: 20px;
+            background-color: transparent;
+            border: 1px solid var(--status-green);
+            color: var(--status-green);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 22px;
+            line-height: 22px;
+            vertical-align: middle;
+        }
+        
+        .attestation-badge-error {
+            border: 1px solid var(--status-red) !important;
+            color: var(--status-red) !important;
+            background-color: rgba(255, 77, 109, 0.1) !important;
+        }
+        
+        .attestation-badge-warning {
+            border: 1px solid var(--status-yellow) !important;
+            color: var(--status-yellow) !important;
+            background-color: rgba(255, 190, 11, 0.1) !important;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .about-btn-container {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10;
+        }
+        .about-btn {
+            background: transparent;
+            color: var(--accent-secondary);
+            border: 2px solid var(--accent-secondary);
+            border-radius: 24px;
+            padding: 0.55em 1.5em;
+            font-size: 1.02rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: none;
+            cursor: pointer;
+            transition: border-color 0.18s;
+            outline: none;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-btn::before {
+            display: none;
+        }
+        .about-btn:hover, .about-btn:focus {
+            color: var(--accent-secondary);
+            background: transparent;
+            border-color: var(--accent-primary);
+            box-shadow: none;
+            transform: none;
+        }
+        @media (max-width: 600px) {
+            .about-btn-container {
+                position: static;
+                display: flex;
+                justify-content: center;
+                margin-bottom: 1.2rem;
+                margin-top: 0;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .subtitle {
+                font-size: 1rem;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="about-btn-container" style="display: flex; align-items: center;">
+        <a href="about.html" class="about-btn">About</a>
+        <a href="https://github.com/letmaik/mcp-provenance-monitor" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; margin-left: 2em;">
+            <img src="github-mark-white.svg" alt="GitHub" style="width:2em;height:2em;display:block;" />
+        </a>
+    </div>
+    <header>
+        <h1>MCP Provenance Monitor</h1>
+        <p class="subtitle">Supply Chain Provenance of Local MCP Servers</p>
+        <div style="margin: 1.5rem auto 0 auto; max-width: 400px; text-align: center;">
+            <input id="search-input" type="text" placeholder="Search package name..." style="width: 100%; padding: 0.6em 1em; border-radius: 8px; border: 1px solid #333; background: #18182a; color: #fff; font-size: 1rem; margin-top: 0.5em; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        </div>
+    </header>
+    
+    <main>
+        <div class="server-grid" id="server-grid">
+            <!-- Server cards will be inserted here dynamically -->
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            let servers = [];
+            try {
+                // Fetch the summary.json file
+                const response = await fetch('data/summary.json');
+                servers = (await response.json()).packages;
+                // sort by name
+                servers.sort((a, b) => a.name.localeCompare(b.name));
+                
+                // Get the container for the server cards
+                const serverGrid = document.getElementById('server-grid');
+                
+                // Function to render servers based on filter
+                function renderServers(filter = '') {
+                    serverGrid.innerHTML = '';
+                    const filtered = servers.filter(server => server.name.toLowerCase().includes(filter.toLowerCase()));
+                    filtered.forEach(server => {
+                        let statusClass = 'status-green';
+                        if (server.has_error) {
+                            statusClass = 'status-red';
+                        } else if (server.deps_errors === server.deps && server.deps > 0) {
+                            statusClass = 'status-red';
+                        } else if (server.deps_errors > 0) {
+                            statusClass = 'status-yellow';
+                        }
+                        let packageStatusBadge = '';
+                        if (server.has_error) {
+                            packageStatusBadge = '<span class="stat-badge stat-badge-error">Unverified</span>';
+                        } else {
+                            packageStatusBadge = '<span class="stat-badge stat-badge-success">Verified</span>';
+                        }
+                        let depStatusBadge = '';
+                        if (server.deps_errors > 0) {
+                            depStatusBadge = `<span class="stat-badge stat-badge-warning">${server.deps_errors} unverified</span>`;
+                        } else if (server.deps > 0) {
+                            depStatusBadge = '<span class="stat-badge stat-badge-success">All verified</span>';
+                        }
+                        const coveragePercentage = server.deps > 0 ? Math.round(((server.deps - server.deps_errors) / server.deps) * 100) : 0;
+                        let attestationBadges = '';
+                        if (server.attestation_issuers && server.attestation_issuers.length > 0 && !server.has_error) {
+                            attestationBadges = server.attestation_issuers.map(issuer => {
+                                let label = issuer === 'https://token.actions.githubusercontent.com' ? 'GitHub Actions' : issuer;
+                                return `<span class=\"attestation-badge\">${label}</span>`;
+                            }).join(' ');
+                        } else {
+                            attestationBadges = '<span class="attestation-badge attestation-badge-error">missing</span>';
+                        }
+                        let typeLabel = server.type === 'pypi' ? 'PyPI' : server.type;
+                        let typeBadge = `<span class="stat-badge stat-badge-neutral" style="margin-left:0.5em;">${typeLabel}</span>`;
+                        const serverCard = document.createElement('div');
+                        serverCard.className = 'server-card';
+                        serverCard.innerHTML = `
+                            <div class="server-name-container">
+                                <h2 class="server-name">${server.name} <span class="server-version">${server.version}</span>${typeBadge}</h2>
+                                <span class="status-light ${statusClass}"></span>
+                            </div>
+                            <div class="server-stats">
+                                <div class="attestation-info">
+                                    <div>Package Provenance: ${attestationBadges}</div>
+                                    <div class="dependency-container">
+                                        <div>Dependency Provenance: 
+                                            <span class="attestation-badge${server.deps_errors === 0 ? '' : server.deps_errors === server.deps ? ' attestation-badge-error' : ' attestation-badge-warning'}">${server.deps - server.deps_errors} of ${server.deps}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        serverCard.addEventListener('click', () => {
+                            window.location.href = `detail.html?package=${encodeURIComponent(server.name)}&type=${encodeURIComponent(server.type)}`;
+                        });
+                        serverCard.style.cursor = 'pointer';
+                        serverGrid.appendChild(serverCard);
+                    });
+                }
+                // Initial render
+                renderServers();
+                // Add search event
+                const searchInput = document.getElementById('search-input');
+                searchInput.addEventListener('input', (e) => {
+                    renderServers(e.target.value);
+                });
+            } catch (error) {
+                console.error('Failed to load server data:', error);
+                document.getElementById('server-grid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
+                        <h2>Error Loading Data</h2>
+                        <p>Failed to load server information. Please check your connection and try again.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

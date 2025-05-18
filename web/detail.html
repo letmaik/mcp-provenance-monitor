@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Package Details - MCP Provenance Monitor</title>
+    <link rel="icon" type="image/png" href="favicon-32x32.png">
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --accent-primary: #4e54c8;
+            --accent-secondary: #8f94fb;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8d4;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --status-red: #ff4d6d;
+            --status-yellow: #ffbe0b;
+            --status-green: #06d6a0;
+            --card-bg: rgba(26, 26, 46, 0.7);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(78, 84, 200, 0.3);
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        /* Global link styling */
+        a {
+            text-decoration: none;
+            transition: text-decoration 0.2s;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Specific link colors */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+        
+        .flyout-artifact-name a {
+            color: var(--text-primary);
+        }
+        
+        .flyout-attestation-value a {
+            color: var(--accent-secondary);
+        }
+        
+        .package-header {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .package-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+        
+        .package-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .package-name {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .package-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(78, 84, 200, 0.2);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(78, 84, 200, 0.4);
+        }
+        
+        .status-light {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 1rem;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        
+        .status-red {
+            background-color: var(--status-red);
+            box-shadow: 0 0 15px var(--status-red);
+        }
+        
+        .status-yellow {
+            background-color: var(--status-yellow);
+            box-shadow: 0 0 15px var(--status-yellow);
+        }
+        
+        .status-green {
+            background-color: var(--status-green);
+            box-shadow: 0 0 15px var(--status-green);
+        }
+        
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-left: 1rem;
+        }
+        
+        .status-badge-error {
+            background-color: rgba(255, 77, 109, 0.2);
+            border: 1px solid rgba(255, 77, 109, 0.4);
+            color: var(--status-red);
+        }
+        
+        .status-badge-warning {
+            background-color: rgba(255, 190, 11, 0.2);
+            border: 1px solid rgba(255, 190, 11, 0.4);
+            color: var(--status-yellow);
+        }
+        
+        .status-badge-success {
+            background-color: rgba(6, 214, 160, 0.2);
+            border: 1px solid rgba(6, 214, 160, 0.4);
+            color: var(--status-green);
+        }
+        
+        .package-stats {
+            display: flex;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-item {
+            background: rgba(14, 14, 22, 0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            flex: 1;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .content-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .section-title {
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+        
+        /* Dependency Tree Visualization */
+        .tree-container {
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+        
+        .tree {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+        }
+        
+        .tree-node {
+            position: relative;
+            min-width: 180px; /* Reduced from 200px */
+        }
+        
+        .node-content {
+            padding: 0.5rem; /* Reduced from 0.75rem */
+            background: rgba(14, 14, 22, 0.6);
+            border-radius: 8px;
+            margin: 0.25rem; /* Reduced from 0.5rem */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .node-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .root-node .node-content {
+            background: rgba(78, 84, 200, 0.2);
+            border: 1px solid rgba(78, 84, 200, 0.4);
+        }
+        
+        .node-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+        
+        .node-name {
+            font-weight: bold;
+            font-size: 0.9rem; /* Slightly smaller font */
+            margin-right: 0.5rem;
+        }
+        
+        .node-version {
+            font-size: 0.75rem; /* Reduced from 0.8rem */
+            color: var(--text-secondary);
+        }
+        
+        .node-status {
+            margin-top: 0.25rem; /* Reduced from 0.5rem */
+        }
+        
+        .node-status .status-badge {
+            font-size: 0.7rem; /* Smaller badge */
+            padding: 0.1rem 0.5rem; /* Reduced padding */
+            margin-left: 0; /* Remove margin since it's now in a flex container */
+        }
+        
+        .tree-level {
+            display: flex;
+            flex-direction: column;
+            padding-left: 20px; /* Reduced from 30px to decrease indentation */
+            position: relative;
+        }
+        
+        /* Remove the tree connecting lines */
+        .tree-level::before {
+            display: none;
+        }
+        
+        .tree-node::before {
+            display: none;
+        }
+        
+        .root-node::before {
+            display: none;
+        }
+        
+        /* Error list styles - removing as these are no longer used */
+        .error-list,
+        .error-item,
+        
+        /* Attestation section - removing as these are no longer used */
+        .attestation-item,
+        .attestation-header,
+        .attestation-details,
+        
+        /* Tab system - removing as it's no longer used */
+        .tab-container,
+        .tab-buttons,
+        .tab-button,
+        .tab-content {
+            display: none; /* Setting to none to prevent them from affecting layout if referenced elsewhere */
+        }
+        
+        /* The remaining styles will be kept for future use */
+        
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            color: var(--status-red);
+            background: rgba(255, 77, 109, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 77, 109, 0.3);
+        }
+        
+        /* Flyout styles */
+        .flyout-container {
+            position: fixed;
+            display: none;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(78, 84, 200, 0.4);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            max-width: 600px; /* Increased from 500px to make it wider */
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        
+        .flyout-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .flyout-version {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .flyout-section {
+            margin-bottom: 1rem;
+        }
+        
+        .flyout-section-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .flyout-artifact {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+        
+        .flyout-artifact:last-child {
+            border-bottom: none;
+        }
+        
+        .flyout-artifact-name {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .flyout-artifact-hash {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+        
+        .flyout-attestation {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(14, 14, 22, 0.4);
+            border-radius: 4px;
+        }
+        
+        .flyout-attestation-missing {
+            color: var(--status-red);
+            font-style: italic;
+        }
+        
+        .flyout-attestation-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .flyout-attestation-item {
+            display: flex;
+        }
+        
+        .flyout-attestation-label {
+            width: 100px;
+            color: var(--text-secondary);
+        }
+        
+        .flyout-attestation-value {
+            flex: 1;
+            word-break: break-all;
+        }
+        
+        /* Custom scrollbar styles for flyout */
+        .flyout-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .flyout-container::-webkit-scrollbar-track {
+            background: rgba(14, 14, 22, 0.4);
+            border-radius: 4px;
+        }
+        
+        .flyout-container::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+        
+        .flyout-container::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-secondary);
+        }
+        
+        /* Firefox scrollbar */
+        .flyout-container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-primary) rgba(14, 14, 22, 0.4);
+        }
+        
+        /* Debug styles */
+        .debug-info {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .stat-badge {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 6px;
+            font-weight: normal;
+        }
+        .stat-badge-error {
+            background-color: rgba(255, 77, 109, 0.2);
+            border: 1px solid rgba(255, 77, 109, 0.4);
+            color: var(--status-red);
+        }
+        .stat-badge-warning {
+            background-color: rgba(255, 190, 11, 0.2);
+            border: 1px solid rgba(255, 190, 11, 0.4);
+            color: var(--status-yellow);
+        }
+        .stat-badge-success {
+            background-color: rgba(6, 214, 160, 0.2);
+            border: 1px solid rgba(6, 214, 160, 0.4);
+            color: var(--status-green);
+        }
+
+        .package-type a, a.package-type {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+
+        .about-btn-container {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10;
+        }
+        .about-btn {
+            background: transparent;
+            color: var(--accent-secondary);
+            border: 2px solid var(--accent-secondary);
+            border-radius: 24px;
+            padding: 0.55em 1.5em;
+            font-size: 1.02rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: none;
+            cursor: pointer;
+            transition: border-color 0.18s;
+            outline: none;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-btn::before {
+            display: none;
+        }
+        .about-btn:hover, .about-btn:focus {
+            color: var(--accent-secondary);
+            background: transparent;
+            border-color: var(--accent-primary);
+            box-shadow: none;
+            transform: none;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .about-btn-container {
+                position: static;
+                display: flex;
+                justify-content: center;
+                margin-bottom: 1.2rem;
+                margin-top: 0;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .subtitle {
+                font-size: 1rem;
+            }
+            body {
+                padding: 1rem;
+            }
+            .flyout-container {
+                left: 0 !important;
+                right: 0;
+                top: auto !important;
+                bottom: 0;
+                width: 100vw !important;
+                max-width: 100vw !important;
+                min-width: 0 !important;
+                border-radius: 16px 16px 0 0;
+                max-height: 60vh;
+                padding: 1.2rem 1rem 2.2rem 1rem;
+                font-size: 1rem;
+                z-index: 1000;
+                box-shadow: 0 -4px 32px rgba(0,0,0,0.5);
+            }
+            .flyout-title {
+                flex-wrap: wrap;
+                width: 100%;
+                gap: 0.4em 0.7em;
+                word-break: break-word;
+            }
+            .flyout-title > span {
+                min-width: 0;
+                max-width: 100%;
+                word-break: break-word;
+            }
+            .node-header {
+                flex-wrap: wrap;
+                gap: 0.3rem 0.5rem;
+                align-items: flex-start;
+            }
+            .tree {
+                min-width: 0;
+            }
+            .tree-node {
+                min-width: 0;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .node-content {
+                word-break: break-word;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="about-btn-container" style="display: flex; align-items: center;">
+        <a href="about.html" class="about-btn">About</a>
+        <a href="https://github.com/letmaik/mcp-provenance-monitor" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; margin-left: 2em;">
+            <img src="github-mark-white.svg" alt="GitHub" style="width:2em;height:2em;display:block;" />
+        </a>
+    </div>
+    <header>
+        <h1>MCP Provenance Monitor</h1>
+        <p class="subtitle">Supply Chain Provenance Details</p>
+    </header>
+    
+    <main>
+        <a href="index.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Overview
+        </a>
+        
+        <div id="loading" class="loading">
+            Loading package details...
+        </div>
+        
+        <div id="package-details" style="display: none;">
+            <div class="package-header">
+                <div class="package-title">
+                    <h2 class="package-name" id="package-name"></h2>
+                    <span class="package-version" id="package-version" style="font-size:1.2rem;color:var(--text-secondary);margin-right:1rem;"></span>
+                    <span class="package-type" id="package-type"></span>
+                    <span class="status-light" id="package-status-light"></span>
+                </div>
+                
+                <div class="package-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Package Provenance</div>
+                        <div class="stat-value" id="package-provenance-badge">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Dependency Provenance</div>
+                        <div class="stat-value" id="dependency-provenance-badge">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3 class="section-title">Details</h3>
+                <div class="tree-container">
+                    <div class="tree" id="dependency-tree">
+                        <!-- Tree will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab container removed as it will be implemented as flyouts later -->
+        </div>
+        
+        <div id="error-message" class="error-message" style="display: none;">
+            Failed to load package details. The package may not exist or there might be a connection issue.
+        </div>
+        
+        <div id="flyout" class="flyout-container"></div>
+    </main>
+    
+    <script>
+        // Track mouse state for flyout interaction
+        let mouseOverNode = false;
+        let mouseOverFlyout = false;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get package name and type from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const packageName = urlParams.get('package');
+            const packageType = urlParams.get('type');
+            
+            if (!packageName) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').textContent = 'No package specified. Please return to the overview page.';
+                document.getElementById('error-message').style.display = 'block';
+                return;
+            }
+            
+            // Load package details
+            try {
+                // Format package name for filename (handle special characters)
+                const packageFilename = `${packageType}_${packageName.toLowerCase().replace('/', '@')}.json`;
+                const response = await fetch(`data/packages/${packageFilename}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load package details (${response.status})`);
+                }
+                
+                const packageData = await response.json();
+                renderPackageDetails(packageName, packageType, packageData);
+            } catch (error) {
+                console.error('Error loading package data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        });
+        
+        function renderPackageDetails(packageName, packageType, data) {
+            // Store package data globally for access by flyout functions
+            window.packageData = data;
+
+            // Hide loading message and show details
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('package-details').style.display = 'block';
+
+            // Get the dependency tree and package info from the data
+            const packageInfo = data.packages[packageName];
+            if (!packageInfo) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').textContent = `Package ${packageName} not found in the data.`;
+                document.getElementById('error-message').style.display = 'block';
+                return;
+            }
+
+            // Set basic package info
+            document.getElementById('package-name').textContent = packageName;
+            document.getElementById('package-version').textContent = packageInfo.version ? packageInfo.version : '';
+            // Handle specific package types for display
+            let displayType = packageType;
+            let typeBadgeHtml = '';
+            if (packageType === 'pypi') {
+                displayType = 'PyPI';
+                const pypiUrl = `https://pypi.org/project/${packageName}/${packageInfo.version || ''}/`;
+                typeBadgeHtml = `<a href="${pypiUrl}" target="_blank" class="package-type">${displayType}</a>`;
+            } else if (packageType === 'npm') {
+                displayType = 'npm';
+                const npmUrl = `https://www.npmjs.com/package/${packageName}/v/${packageInfo.version || ''}`;
+                typeBadgeHtml = `<a href="${npmUrl}" target="_blank" class="package-type">${displayType}</a>`;
+            } else {
+                typeBadgeHtml = `<span class=\"package-type\">${displayType}</span>`;
+            }
+            document.getElementById('package-type').outerHTML = typeBadgeHtml;
+
+            // Collect all attestations for this package
+            const packageAttestations = [];
+            if (packageInfo.artifacts) {
+                packageInfo.artifacts.forEach(artifact => {
+                    if (artifact.attestations) {
+                        packageAttestations.push(...artifact.attestations);
+                    }
+                });
+            }
+
+            // Check if the main package has any error
+            const packageHasError = packageAttestations.some(att => att.error_code);
+
+            // Calculate error count for dependencies
+            let depErrorCount = 0;
+            const totalDeps = Object.keys(data.packages).length - 1; // -1 to exclude the main package
+
+            // Check each dependency for errors
+            Object.keys(data.packages).forEach(depName => {
+                if (depName !== packageName) { // Skip main package
+                    const depInfo = data.packages[depName];
+                    let hasError = false;
+
+                    if (depInfo.artifacts) {
+                        for (const artifact of depInfo.artifacts) {
+                            if (artifact.attestations && artifact.attestations.some(att => att.error_code)) {
+                                hasError = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasError) {
+                        depErrorCount++;
+                    }
+                }
+            });
+
+            // Set package status
+            let statusClass = 'status-green';
+            let statusBadgeClass = 'status-badge-success';
+            let statusText = 'Verified';
+
+            if (packageHasError) {
+                statusClass = 'status-red';
+                statusBadgeClass = 'status-badge-error';
+                statusText = 'Unverified';
+            } else if (depErrorCount > 0) {
+                statusClass = 'status-yellow';
+                statusBadgeClass = 'status-badge-warning';
+                statusText = 'Dependencies Unverified';
+            }
+
+            document.getElementById('package-status-light').className = `status-light ${statusClass}`;
+
+            // Set package provenance badge
+            let provenanceBadge = '';
+            const missingAttestation = packageAttestations.some(att => att.error_code === 'missing');
+            const otherError = packageAttestations.some(att => att.error_code && att.error_code !== 'missing');
+            if (missingAttestation) {
+                provenanceBadge = '<span class="stat-badge stat-badge-error">missing</span>';
+            } else if (otherError) {
+                provenanceBadge = '<span class="stat-badge stat-badge-error">invalid</span>';
+            } else {
+                // Collect unique issuers
+                const issuers = Array.from(new Set(packageAttestations.map(att => att.issuer).filter(Boolean)));
+                if (issuers.length > 0) {
+                    provenanceBadge = issuers.map(issuer => {
+                        let label = issuer === 'https://token.actions.githubusercontent.com' ? 'GitHub Actions' : issuer;
+                        return `<span class=\"stat-badge stat-badge-success\">${label}</span>`;
+                    }).join(' ');
+                } else {
+                    provenanceBadge = '<span class="stat-badge stat-badge-error">missing</span>';
+                }
+            }
+            document.getElementById('package-provenance-badge').innerHTML = provenanceBadge;
+
+            // Set dependency provenance badge
+            let depBadge = '';
+            const verifiedDeps = totalDeps - depErrorCount;
+            if (depErrorCount > 0) {
+                depBadge = `<span class="stat-badge stat-badge-warning">${verifiedDeps} of ${totalDeps}</span>`;
+            } else if (totalDeps > 0) {
+                depBadge = `<span class="stat-badge stat-badge-success">${verifiedDeps} of ${totalDeps}</span>`;
+            } else {
+                depBadge = '<span class="stat-badge stat-badge-success">No dependencies</span>';
+            }
+            document.getElementById('dependency-provenance-badge').innerHTML = depBadge;
+
+            // Build a dependency tree structure if it doesn't exist
+            if (!data.dependency_tree) {
+                data.dependency_tree = {
+                    tree: buildDependencyTree(data, packageName)
+                };
+            }
+
+            // Render dependency tree
+            renderDependencyTree(data.dependency_tree.tree);
+        }
+        
+        function buildDependencyTree(data, rootPackageName) {
+            // Build a tree structure from the flat packages data
+            const tree = {
+                name: rootPackageName,
+                version: data.packages[rootPackageName]?.version || 'unknown',
+                dependencies: []
+            };
+            
+            const packageInfo = data.packages[rootPackageName];
+            if (packageInfo && packageInfo.dependencies) {
+                // Add each dependency as a child node
+                for (const depName of packageInfo.dependencies) {
+                    if (data.packages[depName]) {
+                        const childTree = buildDependencyTree(data, depName);
+                        tree.dependencies.push(childTree);
+                    }
+                }
+            }
+            
+            return tree;
+        }
+        
+        function getPackageInfo(data, packageName) {
+            return data.packages[packageName] || {};
+        }
+        
+        function getPackageAttestations(data, packageName) {
+            const packageInfo = data.packages[packageName];
+            if (!packageInfo || !packageInfo.artifacts) return [];
+            
+            const attestations = [];
+            packageInfo.artifacts.forEach(artifact => {
+                if (artifact.attestations) {
+                    attestations.push(...artifact.attestations);
+                }
+            });
+            
+            return attestations;
+        }
+        
+        function renderDependencyTree(treeData) {
+            const treeContainer = document.getElementById('dependency-tree');
+            treeContainer.innerHTML = ''; // Clear existing content
+            
+            // Create the root node
+            const rootLevel = document.createElement('div');
+            rootLevel.className = 'tree-level';
+            
+            const rootNode = createTreeNode(treeData.name, treeData, true);
+            rootLevel.appendChild(rootNode);
+            
+            // Add children nodes recursively
+            if (treeData.dependencies && treeData.dependencies.length > 0) {
+                const childLevel = renderTreeLevel(treeData.dependencies);
+                rootLevel.appendChild(childLevel);
+            }
+            
+            treeContainer.appendChild(rootLevel);
+        }
+        
+        function renderTreeLevel(dependencies) {
+            const level = document.createElement('div');
+            level.className = 'tree-level';
+            
+            dependencies.forEach(dep => {
+                const node = createTreeNode(dep.name, dep, false);
+                level.appendChild(node);
+                
+                if (dep.dependencies && dep.dependencies.length > 0) {
+                    const childLevel = renderTreeLevel(dep.dependencies);
+                    node.appendChild(childLevel);
+                }
+            });
+            
+            return level;
+        }
+        
+        function createTreeNode(name, nodeData, isRoot) {
+            const node = document.createElement('div');
+            node.className = `tree-node ${isRoot ? 'root-node' : ''}`;
+
+            // Check attestations for badge logic
+            const attestations = getPackageAttestations(window.packageData, name);
+            const missingAttestation = attestations.some(att => att.error_code === 'missing');
+            const otherError = attestations.some(att => att.error_code && att.error_code !== 'missing');
+            let badgeHtml = '';
+            if (missingAttestation) {
+                badgeHtml = '<span class="stat-badge stat-badge-error">missing</span>';
+            } else if(otherError) {
+                badgeHtml = '<span class="stat-badge stat-badge-error">invalid</span>';
+            } else {
+                const issuers = Array.from(new Set(attestations.map(att => att.issuer).filter(Boolean)));
+                if (issuers.length > 0) {
+                    badgeHtml = issuers.map(issuer => {
+                        let label = issuer === 'https://token.actions.githubusercontent.com' ? 'GitHub Actions' : issuer;
+                        return `<span class=\"stat-badge stat-badge-success\">${label}</span>`;
+                    }).join(' ');
+                } else {
+                    badgeHtml = '<span class="stat-badge stat-badge-error">missing</span>';
+                }
+            }
+
+            const content = document.createElement('div');
+            content.className = 'node-content';
+            content.innerHTML = `
+                <div class="node-header">
+                    <div class="node-name">${name}</div>
+                    ${badgeHtml}
+                </div>
+                <div class="node-version">${nodeData.version || ''}</div>
+            `;
+
+            // Update event listeners to track mouse state
+            content.addEventListener('mouseenter', (e) => {
+                mouseOverNode = true;
+                showPackageDetailsFlyout(e, name, nodeData);
+            });
+
+            content.addEventListener('mouseleave', () => {
+                mouseOverNode = false;
+                setTimeout(checkHideFlyout, 50); // Small delay to allow mouse to enter flyout
+            });
+
+            node.appendChild(content);
+            return node;
+        }
+
+        function showPackageDetailsFlyout(event, packageName, nodeData) {
+            const flyout = document.getElementById('flyout');
+            const packageData = window.packageData;
+            if (!packageData || !packageData.packages[packageName]) {
+                return;
+            }
+            // Add event listeners to the flyout
+            flyout.addEventListener('mouseenter', () => {
+                mouseOverFlyout = true;
+            });
+            flyout.addEventListener('mouseleave', () => {
+                mouseOverFlyout = false;
+                setTimeout(checkHideFlyout, 50);
+            });
+            const packageInfo = packageData.packages[packageName];
+            // Calculate flyout position
+            const rect = event.target.getBoundingClientRect();
+            flyout.style.left = `${rect.right + 20}px`;
+            // Temporarily set top to 0 to measure height after content is set
+            flyout.style.top = `0px`;
+            // Collect all attestations for this package's artifacts
+            const allAttestations = [];
+            if (packageInfo.artifacts) {
+                packageInfo.artifacts.forEach(artifact => {
+                    if (artifact.attestations) {
+                        allAttestations.push(...artifact.attestations);
+                    }
+                });
+            }
+            const missingAttestation = allAttestations.some(att => att.error_code === 'missing');
+            const otherError = allAttestations.some(att => att.error_code && att.error_code !== 'missing');
+            let badgeHtml = '';
+            if (missingAttestation) {
+                badgeHtml = '<span class="stat-badge stat-badge-error">missing</span>';
+            } else if (otherError) {
+                badgeHtml = '<span class="stat-badge stat-badge-error">invalid</span>';
+            } else {
+                const issuers = Array.from(new Set(allAttestations.map(att => att.issuer).filter(Boolean)));
+                if (issuers.length > 0) {
+                    badgeHtml = issuers.map(issuer => {
+                        let label = issuer === 'https://token.actions.githubusercontent.com' ? 'GitHub Actions' : issuer;
+                        return `<span class=\"stat-badge stat-badge-success\">${label}</span>`;
+                    }).join(' ');
+                } else {
+                    badgeHtml = '<span class="stat-badge stat-badge-error">missing</span>';
+                }
+            }
+            // Add package type badge (from main package type)
+            let mainType = packageInfo.type;
+            let typeBadgeHtml = '';
+            if (mainType === 'pypi') {
+                const pypiUrl = `https://pypi.org/project/${packageName}/${packageInfo.version || ''}/`;
+                typeBadgeHtml = `<a href=\"${pypiUrl}\" target=\"_blank\" class=\"package-type\">PyPI</a>`;
+            } else if (mainType === 'npm') {
+                const npmUrl = `https://www.npmjs.com/package/${packageName}/v/${packageInfo.version || ''}`;
+                typeBadgeHtml = `<a href=\"${npmUrl}\" target=\"_blank\" class=\"package-type\">npm</a>`;
+            } else if (mainType) {
+                typeBadgeHtml = `<span class=\"package-type\">${mainType}</span>`;
+            }
+            // Generate flyout content
+            let flyoutContent = `
+                <div class=\"flyout-title\">
+                    <span style=\"font-weight:bold;\">${packageName}</span>
+                    <span style=\"margin-left:0.5rem;color:var(--text-secondary);font-size:1rem;font-weight:normal;\">${packageInfo.version || 'Unknown'}</span>
+                    ${typeBadgeHtml ? `<span style=\"margin-left:0.5rem;font-weight:normal;\">${typeBadgeHtml}</span>` : ''}
+                    ${badgeHtml ? `<span style=\"margin-left:auto;\">${badgeHtml}</span>` : ''}
+                </div>
+            `;
+            // Add artifacts section
+            if (packageInfo.artifacts && packageInfo.artifacts.length > 0) {
+                if (packageInfo.type !== 'npm') {
+                    flyoutContent += `
+                        <div class="flyout-section">
+                            <div class="flyout-section-title">Artifacts</div>
+                    `;
+                } else {
+                    flyoutContent += `<div class="flyout-section">`;
+                }
+                packageInfo.artifacts.forEach(artifact => {
+                    if (packageInfo.type === 'npm') {
+                        // For npm, do not show artifact name and hash
+                        flyoutContent += `<div class="flyout-artifact"><div class="flyout-attestation">`;
+                    } else {
+                        flyoutContent += `
+                            <div class="flyout-artifact">
+                                <div class="flyout-artifact-name">
+                                    ${packageInfo.type === 'pypi' ? 
+                                        `<a href="https://pypi.org/project/${packageName}/${packageInfo.version || ''}/#${artifact.name}" 
+                                           target="_blank">
+                                           ${artifact.name}
+                                        </a>` : 
+                                        artifact.name
+                                    }
+                                </div>
+                                <div class="flyout-artifact-hash">${artifact.hash}</div>
+                                <div class="flyout-attestation">
+                        `;
+                    }
+
+                    // Find attestation for this artifact
+                    const artifactAttestation = artifact.attestations && artifact.attestations.length > 0 ? 
+                        artifact.attestations[0] : null;
+                    if (artifactAttestation) {
+                        if (artifactAttestation.error_code) {
+                            // Display error information based on error code
+                            let errorMessage = "Provenance missing";
+                            if (artifactAttestation.error_code !== 'missing') {
+                                errorMessage = `Attestation error: `;
+                                if (artifactAttestation.error_msg) {
+                                    errorMessage += artifactAttestation.error_msg;
+                                } else {
+                                    errorMessage += artifactAttestation.error_code;
+                                }
+                            }
+                            flyoutContent += `<div class="flyout-attestation-missing">${errorMessage}</div>`;
+                        } else {
+                            // Display comprehensive attestation information
+                            flyoutContent += `
+                                <div class="flyout-attestation-info">
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Runner:</span>
+                                        <span class="flyout-attestation-value">${artifactAttestation.runner_env || 'N/A'}</span>
+                                    </div>
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Repository:</span>
+                                        <span class="flyout-attestation-value">
+                                            ${artifactAttestation.repo_url ? 
+                                                `<a href="${artifactAttestation.repo_url}" target="_blank">${artifactAttestation.repo_url}</a>` : 
+                                                'N/A'}
+                                        </span>
+                                    </div>
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Repo Ref:</span>
+                                        <span class="flyout-attestation-value">
+                                            ${artifactAttestation.repo_ref ? 
+                                                `<a href="${artifactAttestation.repo_url}/tree/${artifactAttestation.repo_ref.replace('refs/tags/', '')}" target="_blank">${artifactAttestation.repo_ref}</a>` : 
+                                                'N/A'}
+                                        </span>
+                                    </div>
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Repo Digest:</span>
+                                        <span class="flyout-attestation-value">
+                                            ${artifactAttestation.repo_digest && artifactAttestation.repo_url ? 
+                                                `<a href="${artifactAttestation.repo_url}/commit/${artifactAttestation.repo_digest}" target="_blank">${artifactAttestation.repo_digest}</a>` : 
+                                                (artifactAttestation.repo_digest || 'N/A')}
+                                        </span>
+                                    </div>
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Build Config:</span>
+                                        <span class="flyout-attestation-value">
+                                            ${artifactAttestation.build_config_url ? 
+                                                (() => {
+                                                    const parts = artifactAttestation.build_config_url.split('@');
+                                                    if (parts.length === 2) {
+                                                        const [filePath, refPath] = parts;
+                                                        const repoUrl = artifactAttestation.repo_url || '';
+                                                        const filePathNoRepo = filePath.replace(/^https:\/\/github\.com\/[^\/]+\/[^\/]+/, '');
+                                                        return `<a href="${repoUrl}/blob/${refPath}${filePathNoRepo}" target="_blank">${filePath.split('/').pop()}</a>`;
+                                                    }
+                                                    return `<a href="${artifactAttestation.build_config_url}" target="_blank">${artifactAttestation.build_config_url}</a>`;
+                                                })() : 
+                                                'N/A'}
+                                        </span>
+                                    </div>
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Build Trigger:</span>
+                                        <span class="flyout-attestation-value">${artifactAttestation.build_trigger || 'N/A'}</span>
+                                    </div>
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Run URL:</span>
+                                        <span class="flyout-attestation-value">
+                                            ${artifactAttestation.run_url ? 
+                                                `<a href="${artifactAttestation.run_url}" target="_blank">${artifactAttestation.run_url}</a>` : 
+                                                'N/A'}
+                                        </span>
+                                    </div>
+                                    <div class="flyout-attestation-item">
+                                        <span class="flyout-attestation-label">Public Ledger:</span>
+                                        <span class="flyout-attestation-value">
+                                            ${artifact.hash ? 
+                                                `<a href="https://search.sigstore.dev/?hash=${artifact.hash}" target="_blank">Transparency Log Entry</a>` : 
+                                                'N/A'}
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        flyoutContent += `<div class="flyout-attestation-missing">Provenance missing</div>`;
+                    }
+                    flyoutContent += `
+                            </div>
+                        </div>
+                    `;
+                });
+                flyoutContent += `</div>`;
+            } else {
+                flyoutContent += `
+                    <div class="flyout-section">
+                        <div class="flyout-section-title">Artifacts</div>
+                        <div>No artifact information available</div>
+                    </div>
+                `;
+            }
+            flyout.innerHTML = flyoutContent;
+            flyout.style.display = 'block';
+            // Now adjust top so the flyout stays in the viewport
+            const margin = 12;
+            const flyoutHeight = flyout.offsetHeight;
+            let top = rect.top;
+            if (top + flyoutHeight + margin > window.innerHeight) {
+                top = window.innerHeight - flyoutHeight - margin;
+                if (top < margin) top = margin;
+            }
+            flyout.style.top = `${top}px`;
+        }
+
+        function checkHideFlyout() {
+            if (!mouseOverNode && !mouseOverFlyout) {
+                hidePackageDetailsFlyout();
+            }
+        }
+        
+        function hidePackageDetailsFlyout() {
+            const flyout = document.getElementById('flyout');
+            flyout.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
