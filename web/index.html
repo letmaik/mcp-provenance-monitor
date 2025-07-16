@@ -55,7 +55,7 @@
         
         .server-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
             gap: 1.5rem;
             margin-top: 2rem;
         }
@@ -149,6 +149,23 @@
             flex-direction: column;
             gap: 0.5rem;
             padding: 4px 0;
+        }
+        
+        .provenance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .provenance-label {
+            flex-shrink: 0;
+        }
+        
+        .provenance-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         
         .card-divider {
@@ -383,9 +400,13 @@
                             </div>
                             <div class="server-stats">
                                 <div class="attestation-info">
-                                    <div>Package Provenance: ${attestationBadges}</div>
-                                    <div class="dependency-container">
-                                        <div>Dependency Provenance: 
+                                    <div class="provenance-row">
+                                        <span class="provenance-label">Package Provenance:</span>
+                                        <div class="provenance-badges">${attestationBadges}</div>
+                                    </div>
+                                    <div class="provenance-row">
+                                        <span class="provenance-label">Dependency Provenance:</span>
+                                        <div class="provenance-badges">
                                             <span class="attestation-badge${server.deps_errors === 0 ? '' : server.deps_errors === server.deps ? ' attestation-badge-error' : ' attestation-badge-warning'}">${server.deps - server.deps_errors} of ${server.deps}</span>
                                         </div>
                                     </div>
