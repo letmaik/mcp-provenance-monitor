@@ -25,7 +25,7 @@ A web dashboard for monitoring the software supply chain provenance of local MCP
 - Data is refreshed daily. If you just published a new version, please allow up to one day for the update to appear.
 
 **Do MCP clients check provenance?**
-- Not yet. For updates, see [this issue](https://github.com/modelcontextprotocol/mcp-provenance-monitor/issues/1).
+- Not yet. For updates, see [this issue](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/526).
 
 ## Development
 
