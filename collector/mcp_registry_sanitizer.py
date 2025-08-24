@@ -8,6 +8,7 @@ def sanitize_registry(path: Path) -> MCPRegistry:
 
     servers: list[MCPServer] = []
     for entry in data:
+        entry = entry["server"]
         repo = entry.get("repository", {})
         packages = entry.get("packages", [])
         for pkg in packages:
