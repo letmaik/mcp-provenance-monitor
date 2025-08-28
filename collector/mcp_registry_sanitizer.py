@@ -12,13 +12,13 @@ def sanitize_registry(path: Path) -> MCPRegistry:
         repo = entry.get("repository", {})
         packages = entry.get("packages", [])
         for pkg in packages:
-            pkg_registry = pkg["registry_name"]
+            pkg_registry = pkg["registry_type"]
             if pkg_registry not in ("npm", "pypi"):
                 continue
 
             servers.append(MCPServer(
                 package_registry=pkg_registry,
-                package_name=pkg["name"],
+                package_name=pkg["identifier"],
                 repo_url=repo.get("url"),
                 description=entry.get("description", "")
             ))
