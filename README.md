@@ -12,7 +12,7 @@ A web dashboard for monitoring the software supply chain provenance of local MCP
 
 **Why is MCP server xyz missing?**
 - Currently, only servers published on [npm](https://www.npmjs.com/) or [PyPI](https://pypi.org/) are supported.
-- Server data is sourced from the MCP registry at [https://github.com/modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry), which is still under development and not updated regularly. Manual additions are not supported yet.
+- Server data is sourced from the MCP registry at [https://github.com/modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry), which may not contain every server.
 
 **How can I add provenance to my MCP server?**
 - For NPM packages, see [Generating provenance statements](https://docs.github.com/en/actions/security-guides/supply-chain-security#generating-provenance-statements).
