@@ -11,7 +11,7 @@ def sanitize_registry(path: Path) -> MCPRegistry:
         repo = entry.get("repository", {})
         packages = entry.get("packages", [])
         for pkg in packages:
-            pkg_registry = pkg["registry_type"]
+            pkg_registry = pkg["registryType"]
             if pkg_registry not in ("npm", "pypi"):
                 continue
 
