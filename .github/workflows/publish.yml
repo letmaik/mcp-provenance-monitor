@@ -29,6 +29,7 @@ jobs:
 
     - name: Generate data
       run: |
+        set -e
         cp -r web/ publish/
         python -m collector.main --out publish/data
 
