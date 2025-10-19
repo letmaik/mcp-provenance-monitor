@@ -15,7 +15,7 @@ def download_registry(out_path = Path("registry.json")):
     j = response.json()
     servers.extend(j["servers"])
 
-    while cursor := j["metadata"].get("next_cursor"):
+    while cursor := j["metadata"].get("nextCursor"):
         url = f"{BASE_URL}?limit={limit}&cursor={cursor}"
         response = requests.get(url)
         response.raise_for_status()
